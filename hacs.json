@@ -1,5 +1,5 @@
 {
-  "name": "Ingresso",
-  "country": "BR",
-  "render_readme": true
+    "name": "Integration blueprint",
+    "homeassistant": "2025.2.4",
+    "hacs": "2.0.1"
 }

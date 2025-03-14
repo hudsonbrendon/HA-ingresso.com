@@ -2,17 +2,61 @@
     "config": {
         "step": {
             "user": {
-                "description": "Informe os dados do cinema:",
+                "title": "Ingresso.com - Selecionar Cidade",
+                "description": "Selecione a cidade onde deseja verificar os filmes em cartaz.",
                 "data": {
-                    "city_id": "ID da cidade",
-                    "city_name": "Nome da cidade",
-                    "partnership": "Cinema"
+                    "city_id": "Cidade"
+                }
+            },
+            "theater": {
+                "title": "Ingresso.com - Selecionar Cinema",
+                "description": "Selecione um cinema em {city_name}.",
+                "data": {
+                    "theater": "Cinema"
                 }
             }
         },
         "error": {
-            "city_id_error": "ID da cidade inválido",
-            "partnership_error": "Cinema inválido"
+            "cannot_connect": "Falha na conexão",
+            "invalid_city": "Por favor, selecione uma cidade válida",
+            "no_theaters": "Nenhum cinema encontrado em {city_name}"
+        },
+        "abort": {
+            "already_configured": "Este cinema já está configurado"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Ingresso.com - Atualizar Cidade",
+                "description": "Altere a cidade para filmes em cartaz.",
+                "data": {
+                    "city_id": "Cidade"
+                }
+            },
+            "theater": {
+                "title": "Ingresso.com - Atualizar Cinema",
+                "description": "Selecione um cinema em {city_name}.",
+                "data": {
+                    "theater": "Cinema"
+                }
+            }
+        },
+        "error": {
+            "cannot_connect": "Falha na conexão",
+            "no_theaters": "Nenhum cinema encontrado em {city_name}"
+        }
+    },
+    "entity": {
+        "sensor": {
+            "ingresso": {
+                "name": "Ingresso.com",
+                "state_attributes": {
+                    "last_updated": "Última Atualização",
+                    "theater_name": "Nome do Cinema",
+                    "city_name": "Nome da Cidade"
+                }
+            }
         }
     }
 }
