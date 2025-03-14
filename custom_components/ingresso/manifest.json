@@ -1,14 +1,18 @@
 {
   "domain": "ingresso",
-  "name": "Ingresso",
-  "version": "2.6.6",
-  "documentation": "https://github.com/hudsonbrendon/sensor.ingresso.com#readme",
-  "issue_tracker": "https://github.com/hudsonbrendon/sensor.ingresso.com/issues",
-  "dependencies": [],
+  "name": "Ingresso.com",
   "codeowners": [
-    "@hudsonbrendon"
+    "@brunoroeder"
   ],
-  "requirements": [],
+  "config_flow": true,
+  "documentation": "https://github.com/brunoroeder/HA-ingresso.com",
+  "homekit": {},
   "iot_class": "cloud_polling",
-  "config_flow": true
+  "version": "0.1.0",
+  "requirements": [],
+  "ssdp": [],
+  "zeroconf": [],
+  "dependencies": [],
+  "after_dependencies": [],
+  "integration_type": "service"
 }

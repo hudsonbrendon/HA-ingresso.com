@@ -1,83 +1,76 @@
-"""
-A platform that provides information about movies in city.
+"""Support for Ingresso.com sensors."""
 
-For more details on this component, refer to the documentation at
-https://github.com/hudsonbrendon/sensor.ingresso.com
-"""
 import logging
-from typing import List
+from typing import Any, Dict, Optional
 
-import homeassistant.helpers.config_validation as cv
-import requests
-import voluptuous as vol
-from aiohttp import ClientSession
-from homeassistant import config_entries, const, core
-from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.entity import Entity
-from homeassistant.util.dt import utc_from_timestamp
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from homeassistant.components.sensor import SensorEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import StateType
+from homeassistant.util import dt
 
+from .api import IngressoApiClient
 from .const import (
-    BASE_URL,
     CONF_CITY_ID,
     CONF_CITY_NAME,
     CONF_PARTNERSHIP,
+    CONF_THEATER,
+    CONF_THEATER_NAME,
     DEFAULT_POSTER,
     DOMAIN,
     ICON,
-    SCAN_INTERVAL,
-)
-
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Required(CONF_CITY_ID): cv.string,
-        vol.Required(CONF_CITY_NAME): cv.string,
-        vol.Required(CONF_PARTNERSHIP): cv.string,
-    }
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: core.HomeAssistant,
-    config_entry: config_entries.ConfigEntry,
-    async_add_entities,
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup sensor platform."""
-    config = hass.data[DOMAIN][config_entry.entry_id]
+    """Set up the Ingresso sensor."""
+    config_data = hass.data[DOMAIN][config_entry.entry_id]
+    client = config_data["client"]
 
-    session = async_get_clientsession(hass)
-    sensors = [
-        IngressoSensor(
-            city_id=config[CONF_CITY_ID],
-            city_name=config[CONF_CITY_NAME],
-            partnership=config[CONF_PARTNERSHIP],
-            name=config[CONF_CITY_NAME],
-            session=session,
-        )
-    ]
-    async_add_entities(sensors, update_before_add=True)
+    sensor = IngressoSensor(
+        client=client,
+        city_id=config_data[CONF_CITY_ID],
+        city_name=config_data[CONF_CITY_NAME],
+        partnership=config_data[CONF_PARTNERSHIP],
+        theater=config_data.get(CONF_THEATER, ""),
+        theater_name=config_data.get(CONF_THEATER_NAME, ""),
+    )
+
+    async_add_entities([sensor], update_before_add=True)
 
 
-class IngressoSensor(Entity):
-    """Ingresso.com Sensor class"""
+class IngressoSensor(SensorEntity):
+    """Representation of an Ingresso.com sensor."""
+
+    _attr_has_entity_name = True
+    _attr_attribution = "Dados fornecidos por Ingresso.com"
+    _attr_translation_key = "ingresso"
 
     def __init__(
         self,
-        city_id: int,
+        client: IngressoApiClient,
+        city_id: str,
         city_name: str,
         partnership: str,
-        name: str,
-        session: ClientSession,
+        theater: str,
+        theater_name: str,
     ) -> None:
-        self._state = city_name
+        """Initialize the sensor."""
+        self._client = client
         self._city_id = city_id
+        self._city_name = city_name
         self._partnership = partnership
-        self.session = session
-        self._name = name
+        self._theater = theater
+        self._theater_name = theater_name
+        self._state: Optional[StateType] = None
+        self._available = True
         self._movies = [
             {
                 "title_default": "$title",
@@ -88,89 +81,85 @@ class IngressoSensor(Entity):
                 "icon": "mdi:arrow-down-bold",
             }
         ]
-        self._last_updated = const.STATE_UNKNOWN
+
+        # Create a unique ID based on city and theater
+        unique_suffix = f"{city_id}_{partnership}"
+        if theater:
+            unique_suffix = f"{unique_suffix}_{theater}"
+
+        self._attr_unique_id = f"{DOMAIN}_{unique_suffix}"
+
+        # Create a meaningful name
+        if theater_name:
+            self._attr_name = f"{theater_name}"
+        else:
+            self._attr_name = f"{partnership.capitalize()} {city_name}"
+
+        self._attr_icon = ICON
+        self._attr_native_unit_of_measurement = "filmes"
+        self._last_updated = None
 
     @property
-    def city_id(self) -> int:
-        return self._city_id
+    def available(self) -> bool:
+        """Return True if entity is available."""
+        return self._available
 
     @property
-    def partnership(self) -> str:
-        return self._partnership
+    def native_value(self) -> StateType:
+        """Return the state of the sensor."""
+        return self._state
 
     @property
-    def name(self) -> str:
-        """Name."""
-        return f"{self._partnership.capitalize()} {self._name.capitalize()}"
-
-    @property
-    def state(self) -> str:
-        """State."""
-        return len(self.movies)
-
-    @property
-    def last_updated(self):
-        """Returns date when it was last updated."""
-        if self._last_updated != "unknown":
-            stamp = float(self._last_updated)
-            return utc_from_timestamp(int(stamp))
-
-    @property
-    def movies(self) -> List[dict]:
-        """Movies."""
-        return self._movies
-
-    @property
-    def icon(self) -> str:
-        """Icon."""
-        return ICON
-
-    @property
-    def extra_state_attributes(self) -> dict:
-        """Attributes."""
+    def extra_state_attributes(self) -> Dict[str, Any]:
+        """Return the state attributes."""
         return {
-            "data": self.movies,
+            "data": self._movies,
+            "last_updated": self._last_updated,
+            "theater_name": self._theater_name,
+            "city_name": self._city_name,
         }
 
-    def update(self) -> None:
-        """Update sensor."""
-        _LOGGER.debug("%s - Running update", self.name)
-        url = BASE_URL.format(self.city_id, self.partnership)
+    async def async_update(self) -> None:
+        """Update the sensor."""
+        _LOGGER.debug("%s - Executando atualização", self.name)
 
-        retry_strategy = Retry(
-            total=3,
-            status_forcelist=[400, 401, 500, 502, 503, 504],
-            method_whitelist=["GET"],
-        )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        http = requests.Session()
-        http.mount("https://", adapter)
+        try:
+            movie_data = await self._client.async_get_movies()
 
-        movies = http.get(url, headers={"User-Agent": "Mozilla/5.0"})
-
-        if movies.ok:
-            self._movies.extend(
-                [
-                    dict(
-                        title=movie.get("title", "Não informado"),
-                        poster=movie["images"][0]["url"]
-                        if movie["images"]
+            if movie_data:
+                formatted_movies = [
+                    {
+                        "title": movie.get("title", "Não informado"),
+                        "poster": movie["images"][0]["url"]
+                        if movie.get("images")
                         else DEFAULT_POSTER,
-                        synopsis=movie.get("synopsis", "Não informado"),
-                        director=movie.get("director", "Não informado"),
-                        cast=movie.get("cast", "Não informado"),
-                        studio=movie.get("distributor", "Não informado"),
-                        genres=movie.get("genres", "Não informado"),
-                        runtime=movie.get("duration", "Não informado"),
-                        rating=movie.get("contentRating", "Não informado"),
-                        release="$date",
-                        airdate=movie["premiereDate"]["localDate"].split("T")[0],
-                        city=movie.get("city", "Não informado"),
-                        ticket=movie.get("siteURL", "Não informado"),
-                    )
-                    for movie in movies.json()
+                        "synopsis": movie.get("synopsis", "Não informado"),
+                        "director": movie.get("director", "Não informado"),
+                        "cast": movie.get("cast", "Não informado"),
+                        "studio": movie.get("distributor", "Não informado"),
+                        "genres": movie.get("genres", "Não informado"),
+                        "runtime": movie.get("duration", "Não informado"),
+                        "rating": movie.get("contentRating", "Não informado"),
+                        "release": "$date",
+                        "airdate": movie["premiereDate"]["localDate"].split("T")[0]
+                        if movie.get("premiereDate")
+                        and movie.get("premiereDate").get("localDate")
+                        else "Não informado",
+                        "city": self._city_name,
+                        "theater": self._theater_name,
+                        "ticket": movie.get("siteURL", "Não informado"),
+                    }
+                    for movie in movie_data
                 ]
-            )
-            _LOGGER.debug("Payload received: %s", movies.json())
-        else:
-            _LOGGER.debug("Error received: %s", movies.content)
+
+                self._movies = [self._movies[0], *formatted_movies]
+                self._state = len(formatted_movies)
+                self._last_updated = dt.utcnow().isoformat()
+                self._available = True
+
+            else:
+                self._available = False
+
+        except Exception as error:  # pylint: disable=broad-except
+            _LOGGER.error("Erro ao atualizar sensor Ingresso.com: %s", error)
+            self._available = False
