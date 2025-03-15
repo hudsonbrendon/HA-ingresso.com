@@ -2,13 +2,13 @@
   "domain": "ingresso",
   "name": "Ingresso.com",
   "codeowners": [
-    "@brunoroeder"
+    "@hudsonbrendon"
   ],
   "config_flow": true,
-  "documentation": "https://github.com/brunoroeder/HA-ingresso.com",
+  "documentation": "https://github.com/hudsonbrendon/HA-ingresso.com",
   "homekit": {},
   "iot_class": "cloud_polling",
-  "version": "0.1.0",
+  "version": "3.0.0",
   "requirements": [],
   "ssdp": [],
   "zeroconf": [],
