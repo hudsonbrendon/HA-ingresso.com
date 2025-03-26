@@ -1,104 +1,80 @@
-![hacs_badge](https://img.shields.io/badge/hacs-custom-orange.svg) [![BuyMeCoffee][buymecoffeebedge]][buymecoffee]
+# Ingresso.com Integration for Home Assistant
 
-# Home Assistant ingresso.com
-Custom component to get movie information in your city available at ingresso.com for the home assistant
+This custom integration allows you to track movie listings from [Ingresso.com](https://www.ingresso.com/) in your Home Assistant instance. Keep up with the latest movies showing in theaters near you!
 
-## Install
+## Features
 
-### Installation via HACS
+- Show current movie listings for a selected theater
+- Display movie details including title, synopsis, director, cast, and more
+- Configurable via the Home Assistant UI
+- Search by city and theater
+- Movie posters display in Lovelace UI
 
-Have HACS installed, this will allow you to update easily.
+## Installation
 
-Adding Ingresso to HACS can be using this button:
+### HACS (Recommended)
 
-[![image](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=hudsonbrendon&repository=sensor.ingresso.com&category=integration)
+1. Make sure [HACS](https://hacs.xyz/) is installed in your Home Assistant instance
+2. Add this repository to HACS as a custom repository:
+   - Go to HACS > Integrations
+   - Click the three dots in the upper right corner and select "Custom repositories"
+   - Enter `https://github.com/hudsonbrendon/HA-ingresso.com` in the repository field
+   - Select "Integration" as the category
+   - Click "Add"
+3. Search for "Ingresso.com" in the HACS store and install it
+4. Restart Home Assistant
 
-If the button above doesn't work, add `https://github.com/hudsonbrendon/sensor.ingresso.com` as a custom repository of type Integration in HACS.
+### Manual Installation
 
-- Click Install on the `Ingresso` integration.
-- Restart the Home Assistant.
-
-### Manual installation
-
-- Copy `ingresso` folder from [latest release](https://github.com/hudsonbrendon/sensor.ingresso.com/releases/latest) to your `<config dir>/custom_components/` directory.
-- Restart the Home Assistant.
+1. Download the latest release from the [GitHub repository](https://github.com/hudsonbrendon/HA-ingresso.com)
+2. Unpack the release and copy the `custom_components/ingresso` directory into the `custom_components` directory of your Home Assistant installation
+3. Restart Home Assistant
 
 ## Configuration
 
-Adding Ingresso to your Home Assistant instance can be done via the UI using this button:
+1. Go to Home Assistant Settings > Devices & Services
+2. Click the "+ Add Integration" button
+3. Search for "Ingresso.com" and select it
+4. Follow the configuration steps:
+   - Select your city
+   - Select your preferred theater
+5. The integration will start fetching movie listings for your selected theater
 
-[![image](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=ingresso)
+## Lovelace Card Examples
 
-### Manual Configuration
-
-If the button above doesn't work, you can also perform the following steps manually:
-
-- Navigate to your Home Assistant instance.
-- In the sidebar, click Settings.
-- From the Setup menu, select: Devices & Services.
-- In the lower right corner, click the Add integration button.
-- In the list, search and select `Ingresso`.
-- Follow the on-screen instructions to complete the setup.
-
-## Get your city id
-
-Access the url below with your UF see your city_id in the list of cities in your state.
-
-https://api-content.ingresso.com/v0/states/YOUR-UF
-
-UFs table:
-| UF | Estate |
-| --------- |:-----:|
-| AC | Acre |
-| AL | Alagoas |
-| AP | Amapá |
-| AM | Amazonas |
-| BA | Bahia |
-| CE | Ceará |
-| DF | Distrito Federal |
-| ES | Espírito Santo |
-| GO | Goiás |
-| MT | Mato Grosso |
-| MA | Maranhão |
-| MS | Mato Grosso do Sul |
-| MG | Minas Gerais |
-| PA | Pará |
-| PB | Paraíba |
-| PR | Paraná |
-| PE | Pernambuco |
-| PI | Piauí |
-| RJ | Rio de Janeiro |
-| RN | Rio Grande do Norte |
-| RS | Rio Grande do Sul |
-| RO | Rondônia |
-| RR | Roraima |
-| SC | Santa Catarina |
-| SP | São Paulo |
-| SE | Sergipe |
-| TO | Tocantins |
-
-Example:
-
-https://api-content.ingresso.com/v0/states/SP
-
-# Upcoming media card support
-
-To view the movies from the configured cinema, we use the [upcoming-media-card](https://github.com/custom-cards/upcoming-media-card), install via hacs and add the configuration below (Remembering to replace sensor.cinepolis with your configured sensor) in a manual card:
+You can display the movie listings using various Lovelace cards. Here's an example using the [upcoming-media-card](https://github.com/custom-cards/upcoming-media-card):
 
 ```yaml
 type: custom:upcoming-media-card
-entity: sensor.cinepolis
-title: Cinépolis
+entity: sensor.my_sensor
+title: Movies
+max: 10
 ```
 
-# Debugging
+## Updating
 
-```yaml
-logger:
-  default: info
-  logs:
-    custom_components.ingresso: debug
-```
+### HACS
 
-[buymecoffee]: https://www.buymeacoffee.com/hudsonbrendon
-[buymecoffeebedge]: https://camo.githubusercontent.com/cd005dca0ef55d7725912ec03a936d3a7c8de5b5/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6275792532306d6525323061253230636f666665652d646f6e6174652d79656c6c6f772e737667
+1. Open HACS > Integrations
+2. Find the Ingresso.com integration and click on it
+3. Click "Update" if an update is available
+4. Restart Home Assistant
+
+### Manual
+
+1. Download the latest release
+2. Replace the contents of the `custom_components/ingresso` directory
+3. Restart Home Assistant
+
+## Support
+
+If you have any issues or feature requests, please [open an issue](https://github.com/hudsonbrendon/HA-ingresso.com/issues) on GitHub.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+- Thanks to [Ingresso.com](https://www.ingresso.com/) for providing the movie data
+- Thanks to the Home Assistant community for their support and contributions
