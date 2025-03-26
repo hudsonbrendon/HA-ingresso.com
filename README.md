@@ -1,9 +1,6 @@
 ![hacs_badge](https://img.shields.io/badge/hacs-custom-orange.svg) [![BuyMeCoffee][buymecoffeebedge]][buymecoffee]
 
-# ingresso.com Sensor Component
-
-![logo.jpg](logo.png)
-
+# Home Assistant ingresso.com
 Custom component to get movie information in your city available at ingresso.com for the home assistant
 
 ## Install
