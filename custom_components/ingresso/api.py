@@ -72,7 +72,7 @@ class IngressoApiClient:
     ) -> Any:
         """Obter informações da API."""
         try:
-            async with async_timeout.timeout(10):
+            async with async_timeout.timeout(30):
                 response = await self._session.request(
                     method=method,
                     url=url,

@@ -1,17 +1,20 @@
 """Integração Ingresso.com para Home Assistant."""
 
 import logging
+from datetime import timedelta
 from typing import Any
 
 from homeassistant import config_entries, core
 from homeassistant.const import Platform
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .api import IngressoApiClient
 from .const import CONF_CITY_ID, CONF_CITY_NAME, CONF_PARTNERSHIP, CONF_THEATER, DOMAIN
 
-PLATFORMS = [Platform.SENSOR]
+# Add SWITCH to platforms
+PLATFORMS = [Platform.SENSOR, Platform.SWITCH]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,13 +32,26 @@ async def async_setup_entry(
     )
 
     try:
-        await client.async_get_movies()
+        movies = await client.async_get_movies()
     except Exception as exception:
         raise ConfigEntryAuthFailed("Falha ao conectar") from exception
+
+    # Create a coordinator for data updates
+    coordinator = DataUpdateCoordinator(
+        hass,
+        _LOGGER,
+        name=f"{DOMAIN}_{entry.entry_id}",
+        update_method=client.async_get_movies,
+        update_interval=timedelta(minutes=30),
+    )
+
+    # Initial data
+    await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
         "client": client,
+        "coordinator": coordinator,
         **entry.data,
     }
 
