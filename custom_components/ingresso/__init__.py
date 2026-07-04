@@ -13,8 +13,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .api import IngressoApiClient
 from .const import CONF_CITY_ID, CONF_CITY_NAME, CONF_PARTNERSHIP, CONF_THEATER, DOMAIN
 
-# Add SWITCH to platforms
-PLATFORMS = [Platform.SENSOR, Platform.SWITCH]
+PLATFORMS = [Platform.SENSOR]
 
 _LOGGER = logging.getLogger(__name__)
 
