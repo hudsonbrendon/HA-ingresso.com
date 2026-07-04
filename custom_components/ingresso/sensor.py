@@ -1,6 +1,7 @@
 """Support for Ingresso.com sensors."""
 
 import logging
+from datetime import timedelta
 from typing import Any, Dict, Optional
 
 import voluptuous as vol
@@ -27,6 +28,10 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+# Movie listings change a few times a day; the default 30s platform poll
+# hammers a slow API (each request can take up to the 30s timeout).
+SCAN_INTERVAL = timedelta(minutes=30)
 
 # Service constants
 SERVICE_GET_MOVIES = "get_movies"
