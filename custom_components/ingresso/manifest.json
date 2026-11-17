@@ -1,18 +1,18 @@
 {
   "domain": "ingresso",
   "name": "Ingresso.com",
+  "after_dependencies": [],
   "codeowners": [
     "@hudsonbrendon"
   ],
   "config_flow": true,
+  "dependencies": [],
   "documentation": "https://github.com/hudsonbrendon/HA-ingresso.com",
   "homekit": {},
+  "integration_type": "service",
   "iot_class": "cloud_polling",
-  "version": "3.0.4",
   "requirements": [],
   "ssdp": [],
-  "zeroconf": [],
-  "dependencies": [],
-  "after_dependencies": [],
-  "integration_type": "service"
+  "version": "3.0.4",
+  "zeroconf": []
 }

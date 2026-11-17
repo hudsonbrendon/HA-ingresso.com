@@ -1,0 +1,23 @@
+get_movies:
+  name: Get movies
+  description: Fetch the movies showing at a theater and store them in the ingresso.service_result state.
+  fields:
+    city_id:
+      name: City ID
+      description: Ingresso.com city ID.
+      required: true
+      example: "1"
+      selector:
+        text:
+    partnership:
+      name: Partnership
+      description: Theater partnership slug.
+      required: true
+      selector:
+        text:
+    theater:
+      name: Theater
+      description: Theater ID (optional).
+      required: false
+      selector:
+        text:
