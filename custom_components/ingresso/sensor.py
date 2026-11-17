@@ -2,7 +2,7 @@
 
 import logging
 from datetime import timedelta
-from typing import Any, Dict, Optional
+from typing import Any
 
 import voluptuous as vol
 from homeassistant.components.sensor import SensorEntity
@@ -136,7 +136,7 @@ async def async_setup_entry(
                 },
             )
 
-        except Exception as error:  # pylint: disable=broad-except
+        except Exception as error:  # pylint: disable=broad-except  # noqa: BLE001
             _LOGGER.error("Erro ao obter filmes via serviço: %s", error)
             hass.states.async_set(
                 f"{DOMAIN}.service_result",
@@ -203,7 +203,7 @@ class IngressoSensor(IngressoDeviceEntity):
         self._partnership = partnership
         self._theater = theater
         self._theater_name = theater_name
-        self._state: Optional[StateType] = None
+        self._state: StateType | None = None
         self._available = True
         self._movies = [
             {
@@ -237,7 +237,7 @@ class IngressoSensor(IngressoDeviceEntity):
         return self._state
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:
         """Return the state attributes."""
         return {
             "data": self._movies,
@@ -287,6 +287,6 @@ class IngressoSensor(IngressoDeviceEntity):
             else:
                 self._available = False
 
-        except Exception as error:  # pylint: disable=broad-except
+        except Exception as error:  # pylint: disable=broad-except  # noqa: BLE001
             _LOGGER.error("Erro ao atualizar sensor Ingresso.com: %s", error)
             self._available = False

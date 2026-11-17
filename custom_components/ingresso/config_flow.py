@@ -1,7 +1,7 @@
 """Config flow for Ingresso integration."""
 
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 import aiohttp
 import voluptuous as vol
@@ -46,7 +46,7 @@ class IngressoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             session = async_get_clientsession(self.hass)
             try:
                 self._cities = await self._fetch_cities(session)
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 _LOGGER.error("Error fetching cities: %s", err)
                 errors["base"] = "cannot_connect"
                 return self.async_show_form(
@@ -106,7 +106,7 @@ class IngressoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             "city_name": self._selected_city_name
                         },
                     )
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 _LOGGER.error("Error fetching theaters: %s", err)
                 errors["base"] = "cannot_connect"
                 return self.async_show_form(
@@ -157,7 +157,7 @@ class IngressoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _fetch_cities(
         self, session: aiohttp.ClientSession
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Fetch available cities from API."""
         all_cities = []
 
@@ -171,13 +171,13 @@ class IngressoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             # Sort cities alphabetically by name
             return sorted(all_cities, key=lambda x: x["name"])
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.error("Error fetching cities: %s", err)
             return []
 
     async def _fetch_theaters(
         self, session: aiohttp.ClientSession, city_id: str, partnership: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Fetch theaters for a specific city."""
         try:
             async with session.get(
@@ -189,7 +189,7 @@ class IngressoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         return data["items"]
                     return []
                 return []
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.error("Error fetching theaters: %s", err)
             return []
 
@@ -220,7 +220,7 @@ class IngressoOptionsFlowHandler(config_entries.OptionsFlow):
             session = async_get_clientsession(self.hass)
             try:
                 self._cities = await self._fetch_cities(session)
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 _LOGGER.error("Error fetching cities: %s", err)
                 errors["base"] = "cannot_connect"
                 return self.async_show_form(
@@ -282,7 +282,7 @@ class IngressoOptionsFlowHandler(config_entries.OptionsFlow):
                             "city_name": self._selected_city_name
                         },
                     )
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 _LOGGER.error("Error fetching theaters: %s", err)
                 errors["base"] = "cannot_connect"
                 return self.async_show_form(
@@ -348,7 +348,7 @@ class IngressoOptionsFlowHandler(config_entries.OptionsFlow):
 
     async def _fetch_cities(
         self, session: aiohttp.ClientSession
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Fetch available cities from API."""
         all_cities = []
 
@@ -362,13 +362,13 @@ class IngressoOptionsFlowHandler(config_entries.OptionsFlow):
 
             # Sort cities alphabetically by name
             return sorted(all_cities, key=lambda x: x["name"])
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.error("Error fetching cities: %s", err)
             return []
 
     async def _fetch_theaters(
         self, session: aiohttp.ClientSession, city_id: str, partnership: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Fetch theaters for a specific city."""
         try:
             async with session.get(
@@ -380,6 +380,6 @@ class IngressoOptionsFlowHandler(config_entries.OptionsFlow):
                         return data["items"]
                     return []
                 return []
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.error("Error fetching theaters: %s", err)
             return []

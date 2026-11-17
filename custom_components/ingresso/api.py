@@ -42,7 +42,7 @@ class IngressoApiClient:
         city_id: int,
         partnership: str,
         session: aiohttp.ClientSession,
-        theater: str = None,
+        theater: str = None,  # noqa: RUF013
     ) -> None:
         """Inicializar cliente da API Ingresso.com."""
         self._city_id = city_id

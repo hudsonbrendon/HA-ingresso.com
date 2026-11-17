@@ -2,7 +2,7 @@
 
 import logging
 from datetime import timedelta
-from typing import Any
+from typing import Any  # noqa: F401
 
 from homeassistant import config_entries, core
 from homeassistant.const import Platform
@@ -31,7 +31,7 @@ async def async_setup_entry(
     )
 
     try:
-        movies = await client.async_get_movies()
+        movies = await client.async_get_movies()  # noqa: F841
     except Exception as exception:
         raise ConfigEntryAuthFailed("Falha ao conectar") from exception
 
